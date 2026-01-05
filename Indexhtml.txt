@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Please wait…</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.box {
+    max-width: 380px;
+    background: rgba(0,0,0,0.45);
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+}
+
+h1 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.timer {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 22px;
+    padding: 14px 26px;
+    background: #00ff99;
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 40px;
+    opacity: 0.5;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.btn.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box" id="content">
+    <h1>Preparing your link</h1>
+    <p>Please wait a few seconds. You’ll be redirected automatically.</p>
+    <div class="timer" id="timer">—</div>
+
+    <a href="https://otieu.com/4/8866944"
+       id="manualBtn"
+       class="btn"
+       target="_blank">
+        Continue Now
+    </a>
+</div>
+
+<script>
+// ===== CONFIG =====
+const REDIRECT_URL = "https://otieu.com/4/8866944";
+const MIN_DELAY = 18; // seconds
+const MAX_DELAY = 30; // seconds
+const CAP_HOURS = 24;
+// ==================
+
+const capKey = "redirected_once_24h";
+const now = Date.now();
+const lastRedirect = localStorage.getItem(capKey);
+
+// Random human-like delay
+const delay = Math.floor(Math.random() * (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
+
+if (lastRedirect && (now - lastRedirect) < CAP_HOURS * 60 * 60 * 1000) {
+    document.getElementById("content").innerHTML = `
+        <h1>Access Limit Reached</h1>
+        <p>You’ve already opened this link within the last 24 hours.</p>
+    `;
+} else {
+    let timeLeft = delay;
+    const timerEl = document.getElementById("timer");
+    const btn = document.getElementById("manualBtn");
+
+    timerEl.textContent = timeLeft + "s";
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = timeLeft + "s";
+
+        // Enable button halfway (human-like)
+        if (timeLeft <= Math.ceil(delay / 2)) {
+            btn.classList.add("active");
+        }
+
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            localStorage.setItem(capKey, now);
+            window.location.href = REDIRECT_URL;
+        }
+    }, 1000);
+}
+</script>
+
+</body>
+</html>
